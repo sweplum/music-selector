@@ -7,42 +7,60 @@
 </head>
 <body>
 
-    <h1>🎵 Music Selector🎵</h1>
+    <div class="app-container">
 
-    <div id="upload-section">
-        <input type="file" id="csvInput" accept=".csv">
-        <button id="loadBtn">Load CSV</button>
+        <header class="header">
+            <h1>🎵 Music Selector</h1>
+        </header>
+
+        <div class="main-layout">
+
+            <!-- LEFT SIDEBAR -->
+            <aside class="sidebar glass">
+                <h2>Controls</h2>
+
+                <label class="control-label">Upload CSV</label>
+                <input type="file" id="csvInput" accept=".csv">
+
+                <button id="loadBtn" class="btn">Load CSV</button>
+
+                <label class="control-label">Spin Speed</label>
+                <input type="range" id="speedSlider" min="20" max="300" value="100">
+
+                <label class="checkbox">
+                    <input type="checkbox" id="removeAfter"> Remove after selection
+                </label>
+
+                <label class="checkbox">
+                    <input type="checkbox" id="playSound"> Play sound
+                </label>
+
+                <button id="startBtn" class="btn spin-btn">Spin</button>
+            </aside>
+
+            <!-- MAIN DISPLAY -->
+            <section class="display glass">
+                <h2 id="currentTitle" class="title-display">Upload a CSV to begin</h2>
+                <img id="albumArt" class="album-art" style="display:none;">
+                <p id="description" class="description"></p>
+            </section>
+
+            <!-- HISTORY PANEL -->
+            <aside class="history glass">
+                <h2>History</h2>
+                <div id="history"></div>
+                <button id="clearHistory" class="btn small">Clear History</button>
+            </aside>
+
+        </div>
+
     </div>
-
-    <div id="controls">
-        <label>Spin Speed:
-            <input type="range" id="speedSlider" min="20" max="300" value="100">
-        </label>
-
-        <label>
-            <input type="checkbox" id="removeAfter"> Remove after selection
-        </label>
-
-        <label>
-            <input type="checkbox" id="playSound"> Play sound
-        </label>
-
-        <button id="startBtn">Start Selection</button>
-    </div>
-
-    <div id="display">
-        <h2 id="currentTitle">Upload a CSV to begin</h2>
-        <img id="albumArt" style="display:none;">
-        <p id="description"></p>
-    </div>
-
-    <h2>History</h2>
-    <div id="history"></div>
-    <button id="clearHistory">Clear History</button>
 
     <audio id="dingSound" src="ding.wav"></audio>
 
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <script src="script.js"></script>
+
 </body>
+
 </html>
