@@ -166,6 +166,17 @@ body {
     margin-bottom: 20px;
 }
 
+.wheel-labels-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 260px;
+    pointer-events: none;
+    animation: spin 1s linear infinite;
+    transform-origin: 130px 130px;
+}
+
 .spinner-wheel {
     width: 260px;
     height: 260px;
