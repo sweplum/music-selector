@@ -1,0 +1,36 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
+    background: #f5f5f5;
+}
+
+#upload-section, #controls {
+    margin: 20px auto;
+}
+
+#display {
+    margin-top: 30px;
+}
+
+#albumArt {
+    width: 250px;
+    margin-top: 10px;
+    border-radius: 10px;
+}
+
+#history {
+    margin-top: 20px;
+    text-align: left;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.history-item {
+    background: white;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}

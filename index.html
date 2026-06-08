@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Music Selector</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>🎵 Random Music Selector</h1>
+
+    <div id="upload-section">
+        <input type="file" id="csvInput" accept=".csv">
+        <button id="loadBtn">Load CSV</button>
+    </div>
+
+    <div id="controls">
+        <label>Spin Speed:
+            <input type="range" id="speedSlider" min="20" max="300" value="100">
+        </label>
+
+        <label>
+            <input type="checkbox" id="removeAfter"> Remove after selection
+        </label>
+
+        <label>
+            <input type="checkbox" id="playSound"> Play sound
+        </label>
+
+        <button id="startBtn">Start Selection</button>
+    </div>
+
+    <div id="display">
+        <h2 id="currentTitle">Upload a CSV to begin</h2>
+        <img id="albumArt" style="display:none;">
+        <p id="description"></p>
+    </div>
+
+    <h2>History</h2>
+    <div id="history"></div>
+    <button id="clearHistory">Clear History</button>
+
+    <audio id="dingSound" src="ding.wav"></audio>
+
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
