@@ -2,73 +2,77 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <div class="spinner-wheel" id="spinnerWheel"></div>
-    <div class="equalizer" id="equalizer">
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-    </div>
     <title>Music Selector</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-container">
 
-        <header class="header">
-            <h1>🎵 Music Selector🎵</h1>
-        </header>
+<canvas id="particles"></canvas>
 
-        <div class="main-layout">
+<div class="app-container">
 
-            <!-- LEFT SIDEBAR -->
-            <aside class="sidebar glass">
-                <h2>Controls</h2>
+    <header class="header">
+        <h1>🎵 Music Selector</h1>
+    </header>
 
-                <label class="control-label">Upload CSV</label>
-                <label class="file-upload">
-                    <input type="file" id="csvInput" accept=".csv">
-                    Browse CSV
-                </label>
+    <div class="main-layout">
 
-                <button id="loadBtn" class="btn">Load CSV</button>
+        <!-- LEFT SIDEBAR -->
+        <aside class="sidebar glass">
+            <h2>Controls</h2>
 
-                <label class="control-label">Spin Speed</label>
-                <input type="range" id="speedSlider" min="20" max="300" value="100">
+            <label class="file-upload">
+                <input type="file" id="csvInput" accept=".csv">
+                Browse CSV
+            </label>
 
-                <label class="checkbox">
-                    <input type="checkbox" id="removeAfter"> Remove after selection
-                </label>
+            <label class="control-label">Spin Speed</label>
+            <input type="range" id="speedSlider" min="20" max="300" value="100">
 
-                <label class="checkbox">
-                    <input type="checkbox" id="playSound"> Play sound
-                </label>
+            <label class="checkbox">
+                <input type="checkbox" id="removeAfter"> Remove after selection
+            </label>
 
-                <button id="startBtn" class="btn spin-btn">Spin</button>
-            </aside>
+            <button id="startBtn" class="btn spin-btn">Spin</button>
+        </aside>
 
-            <!-- MAIN DISPLAY -->
-            <section class="display glass">
-                <h2 id="currentTitle" class="title-display">Upload a CSV to begin</h2>
-                <img id="albumArt" class="album-art" style="display:none;">
-                <p id="description" class="description"></p>
-            </section>
+        <!-- MAIN DISPLAY -->
+        <section class="display glass">
 
-            <!-- HISTORY PANEL -->
-            <aside class="history glass">
-                <h2>History</h2>
-                <div id="history"></div>
-                <button id="clearHistory" class="btn small">Clear History</button>
-            </aside>
+            <div class="wheel-container">
+                <div class="spinner-wheel" id="spinnerWheel"></div>
+                <div id="wheelLabels"></div>
+            </div>
 
-        </div>
+            <div class="equalizer" id="equalizer">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+
+            <h2 id="currentTitle" class="title-display">Upload a CSV to begin</h2>
+            <img id="albumArt" class="album-art" style="display:none;">
+            <p id="description" class="description"></p>
+
+        </section>
+
+        <!-- HISTORY PANEL -->
+        <aside class="history glass">
+            <h2>History</h2>
+            <div id="history"></div>
+            <button id="clearHistory" class="btn small">Clear History</button>
+        </aside>
 
     </div>
 
-    <audio id="dingSound" src="ding.wav"></audio>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-    <script src="script.js"></script>
+<audio id="dingSound" src="ding.wav"></audio>
+
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="script.js"></script>
+
 </body>
 </html>
