@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Turn ON animations
         document.getElementById("spinnerWheel").style.display = "block";
         document.getElementById("equalizer").style.display = "flex";
+        document.getElementById("wheelLabels").style.animation = "spin 1s linear infinite";
 
         let cycles = 30;
 
@@ -46,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Turn OFF animations
                 document.getElementById("spinnerWheel").style.display = "none";
                 document.getElementById("equalizer").style.display = "none";
+                document.getElementById("wheelLabels").style.animation = "none";
 
                 // Play sound automatically
                 document.getElementById("dingSound").play();
