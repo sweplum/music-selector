@@ -21,7 +21,11 @@ document.getElementById("startBtn").onclick = () => {
     const speed = document.getElementById("speedSlider").value;
     const removeAfter = document.getElementById("removeAfter").checked;
     const playSound = document.getElementById("playSound").checked;
-
+    
+    // Turn ON animations
+    document.getElementById("spinnerWheel").style.display = "block";
+    document.getElementById("equalizer").style.display = "flex";
+    
     let cycles = 30;
     let interval = setInterval(() => {
         const randomItem = items[Math.floor(Math.random() * items.length)];
@@ -33,6 +37,10 @@ document.getElementById("startBtn").onclick = () => {
 
             const finalItem = items[Math.floor(Math.random() * items.length)];
             updateDisplay(finalItem, true);
+            
+            // Turn OFF animations
+            document.getElementById("spinnerWheel").style.display = "none";
+            document.getElementById("equalizer").style.display = "none";
 
             if (playSound) {
                 document.getElementById("dingSound").play();
