@@ -258,4 +258,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 p.x += p.dx;
                 p.y += p.dy;
                 p.alpha -= 0.02;
-                ctxP.fillStyle = `rgba(0,170,255,${p
+                ctxP.fillStyle = `rgba(0,170,255,${p.alpha})`;
+                ctxP.beginPath();
+                ctxP.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctxP.fill();
+            });
+            if (particles.some(p => p.alpha > 0)) requestAnimationFrame(animate);
+        }
+
+        animate();
+    }
+
+});
