@@ -37,7 +37,7 @@ body {
 
 .main-layout {
     display: grid;
-    grid-template-columns: 250px 1fr 300px;
+    grid-template-columns: 250px 1fr 450px 300px;
     gap: 20px;
     padding: 20px;
     height: 100%;
@@ -139,6 +139,55 @@ body {
     align-items: center;
 }
 
+.live-title {
+    font-size: 26px;
+    margin-bottom: 15px;
+    text-shadow: 0 0 10px #00aaff;
+}
+
+/* WHEEL + POINTER */
+.wheel-wrapper {
+    position: relative;
+    width: 420px;
+    height: 420px;
+    margin-bottom: 20px;
+    transition: transform 0.6s ease;
+}
+
+.wheel-wrapper.shift-left {
+    transform: translateX(-120px);
+}
+
+#wheelCanvas {
+    display: block;
+    margin: 0 auto;
+    transform-origin: 50% 50%;
+}
+
+.pointer {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 16px solid transparent;
+    border-right: 16px solid transparent;
+    border-bottom: 26px solid #00aaff;
+    filter: drop-shadow(0 0 6px #00aaff);
+    z-index: 10;
+}
+
+/* RIGHT INFO PANEL */
+.info-panel {
+    opacity: 1;
+    transition: opacity 0.4s ease;
+}
+
+.info-panel.hidden {
+    opacity: 0;
+}
+
 .title-display {
     font-size: 28px;
     margin-bottom: 20px;
@@ -150,41 +199,11 @@ body {
     border-radius: 15px;
     margin-top: 10px;
     box-shadow: 0 0 20px #00aaff;
-    animation: fadeIn 0.5s ease;
 }
 
 .description {
     margin-top: 15px;
     font-size: 16px;
-}
-
-/* WHEEL + POINTER */
-.wheel-container {
-    position: relative;
-    width: 320px;
-    height: 320px;
-    margin-bottom: 20px;
-}
-
-#wheelCanvas {
-    display: block;
-    margin: 0 auto;
-    transform-origin: 50% 50%;
-    transform: rotate(0deg);
-}
-
-.pointer {
-    position: absolute;
-    top: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 14px solid transparent;
-    border-right: 14px solid transparent;
-    border-bottom: 22px solid #00aaff;
-    filter: drop-shadow(0 0 6px #00aaff);
-    z-index: 10;
 }
 
 /* EQUALIZER */
@@ -225,17 +244,10 @@ body {
     padding: 10px;
     border-radius: 10px;
     margin-bottom: 12px;
-    animation: fadeIn 0.4s ease;
 }
 
 .history-item img {
     width: 80px;
     border-radius: 8px;
     margin-top: 8px;
-}
-
-/* ANIMATIONS */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
 }
