@@ -2,13 +2,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let items = [];
     let history = [];
+    let spinning = false;
+    let currentRotation = 0;
+
+    const wheelCanvas = document.getElementById("wheelCanvas");
+    const ctx = wheelCanvas.getContext("2d");
+    const spinSound = document.getElementById("spinSound");
+    const dingSound = document.getElementById("dingSound");
 
     /* LOAD SAVED ITEMS + HISTORY */
     const savedItems = localStorage.getItem("music_items");
     if (savedItems) {
         try {
             items = JSON.parse(savedItems);
-            updateWheelLabels();
+            drawWheel();
         } catch {}
     }
 
@@ -31,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
             complete: function(results) {
                 items = results.data.filter(row => row.Title);
                 saveItems();
-                updateWheelLabels();
+                drawWheel();
                 alert("CSV Loaded Successfully");
             }
         });
@@ -40,39 +47,36 @@ document.addEventListener("DOMContentLoaded", () => {
     /* SPIN BUTTON – RAFFLE WHEEL STYLE */
     document.getElementById("startBtn").onclick = () => {
         if (items.length === 0) return alert("No items loaded");
+        if (spinning) return;
+
+        spinning = true;
 
         const removeAfter = document.getElementById("removeAfter").checked;
-        const wheel = document.getElementById("spinnerWheel");
-        const spinSound = document.getElementById("spinSound");
-        const dingSound = document.getElementById("dingSound");
-
         const count = items.length;
-        const slotAngle = 360 / count;
+        const sliceAngleDeg = 360 / count;
 
-        // pick target index
+        // choose target index
         const targetIndex = Math.floor(Math.random() * count);
 
-        // base offset so slot 0 is at pointer (top)
-        const baseOffset = -90; // pointer at top
-        const fullSpins = 5;    // number of full rotations
+        // pointer at -90deg (top). slice i center at -90 + i*sliceAngleDeg
+        // we want center of target slice at pointer after rotation R:
+        // (-90 + targetIndex*sliceAngleDeg) + R ≡ -90  => R ≡ -targetIndex*sliceAngleDeg
+        const spins = 5;
+        const finalRotation = 360 * spins - targetIndex * sliceAngleDeg;
 
-        const finalRotation =
-            360 * fullSpins +
-            baseOffset -
-            targetIndex * slotAngle;
+        const speedFactor = document.getElementById("speedSlider").value; // 1–5
+        const duration = 4000 - (speedFactor - 1) * 500; // ms
 
-        // show equalizer while spinning
+        // equalizer on
         document.getElementById("equalizer").style.display = "flex";
 
-        // start spin sound
+        // spin sound
         spinSound.currentTime = 0;
         spinSound.loop = true;
         spinSound.play();
 
-        wheel.style.transform = `rotate(${finalRotation}deg)`;
-
-        const speedFactor = document.getElementById("speedSlider").value; // 1–5
-        const duration = 3000 - (speedFactor - 1) * 400; // faster at higher speed
+        wheelCanvas.style.transition = `transform ${duration}ms cubic-bezier(0.25, 0.8, 0.25, 1)`;
+        wheelCanvas.style.transform = `rotate(${finalRotation}deg)`;
 
         setTimeout(() => {
             // stop spin sound
@@ -96,14 +100,88 @@ document.addEventListener("DOMContentLoaded", () => {
             if (removeAfter) {
                 items.splice(targetIndex, 1);
                 saveItems();
-                updateWheelLabels();
+                drawWheel();
             }
+
+            // normalize rotation so it doesn't grow forever
+            currentRotation = finalRotation % 360;
+            wheelCanvas.style.transition = "none";
+            wheelCanvas.style.transform = `rotate(${currentRotation}deg)`;
+
+            // allow next spin after a tiny delay
+            setTimeout(() => {
+                spinning = false;
+            }, 100);
         }, duration);
     };
 
+    /* DRAW WHEEL ON CANVAS */
+    function drawWheel() {
+        const w = wheelCanvas.width;
+        const h = wheelCanvas.height;
+        const cx = w / 2;
+        const cy = h / 2;
+        const radius = Math.min(cx, cy) - 10;
+
+        ctx.clearRect(0, 0, w, h);
+
+        if (items.length === 0) {
+            // draw placeholder circle
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(0,0,0,0.4)";
+            ctx.fill();
+            ctx.strokeStyle = "rgba(255,255,255,0.2)";
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            return;
+        }
+
+        const count = items.length;
+        const sliceAngle = (2 * Math.PI) / count;
+        const colors = ["#00aaff", "#0044ff", "#00ddff", "#0088ff"];
+
+        for (let i = 0; i < count; i++) {
+            const startAngle = -Math.PI / 2 + i * sliceAngle;
+            const endAngle = startAngle + sliceAngle;
+
+            // slice
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.arc(cx, cy, radius, startAngle, endAngle);
+            ctx.closePath();
+            ctx.fillStyle = colors[i % colors.length];
+            ctx.fill();
+
+            // slice border
+            ctx.strokeStyle = "rgba(0,0,0,0.6)";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // text
+            const midAngle = startAngle + sliceAngle / 2;
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(midAngle);
+            ctx.textAlign = "right";
+            ctx.fillStyle = "#000";
+            ctx.font = "14px Poppins";
+            const text = items[i].Title || "";
+            ctx.fillText(text, radius - 10, 5);
+            ctx.restore();
+        }
+
+        // outer glow ring
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(0,170,255,0.8)";
+        ctx.lineWidth = 4;
+        ctx.stroke();
+    }
+
     /* UPDATE DISPLAY */
     function updateDisplay(item, final) {
-        document.getElementById("currentTitle").textContent = item.Title;
+        document.getElementById("currentTitle").textContent = item.Title || "";
         document.getElementById("description").textContent = final ? (item.Description || "") : "";
 
         const img = document.getElementById("albumArt");
@@ -124,7 +202,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const div = document.createElement("div");
             div.className = "history-item";
             div.innerHTML = `
-                <strong>${item.Title}</strong><br>
+                <strong>${item.Title || ""}</strong><br>
                 ${item.Description || ""}<br>
                 ${item.ImageURL ? `<img src="${item.ImageURL}" width="100">` : ""}
             `;
@@ -138,32 +216,6 @@ document.addEventListener("DOMContentLoaded", () => {
         renderHistory();
     };
 
-    /* WHEEL LABELS – SLOTS AROUND CENTER */
-    function updateWheelLabels() {
-        const container = document.getElementById("wheelLabels");
-        container.innerHTML = "";
-
-        const count = items.length;
-        if (count === 0) return;
-
-        const radius = 100;
-
-        items.forEach((item, i) => {
-            const angle = (i / count) * Math.PI * 2;
-            const x = 130 + radius * Math.cos(angle);
-            const y = 130 + radius * Math.sin(angle);
-
-            const div = document.createElement("div");
-            div.className = "wheel-label";
-            div.style.left = `${x - 40}px`;
-            div.style.top = `${y - 10}px`;
-            div.style.transform = `rotate(${(angle * 180 / Math.PI) + 90}deg)`;
-            div.textContent = item.Title;
-
-            container.appendChild(div);
-        });
-    }
-
     /* SAVE ITEMS + HISTORY */
     function saveItems() {
         localStorage.setItem("music_items", JSON.stringify(items));
@@ -176,7 +228,7 @@ document.addEventListener("DOMContentLoaded", () => {
     /* PARTICLE BURST EFFECT */
     function burstParticles() {
         const canvas = document.getElementById("particles");
-        const ctx = canvas.getContext("2d");
+        const ctxP = canvas.getContext("2d");
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
@@ -193,15 +245,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctxP.clearRect(0, 0, canvas.width, canvas.height);
             particles.forEach(p => {
                 p.x += p.dx;
                 p.y += p.dy;
                 p.alpha -= 0.02;
-                ctx.fillStyle = `rgba(0,170,255,${p.alpha})`;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fill();
+                ctxP.fillStyle = `rgba(0,170,255,${p.alpha})`;
+                ctxP.beginPath();
+                ctxP.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctxP.fill();
             });
             if (particles.some(p => p.alpha > 0)) requestAnimationFrame(animate);
         }
