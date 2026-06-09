@@ -161,55 +161,30 @@ body {
 /* WHEEL + POINTER */
 .wheel-container {
     position: relative;
-    width: 260px;
-    height: 260px;
+    width: 320px;
+    height: 320px;
     margin-bottom: 20px;
 }
 
-.spinner-wheel {
-    width: 260px;
-    height: 260px;
-    border-radius: 50%;
-    border: 6px solid rgba(255,255,255,0.15);
-    position: relative;
+#wheelCanvas {
+    display: block;
     margin: 0 auto;
-    overflow: visible;
+    transform-origin: 50% 50%;
     transform: rotate(0deg);
-    transition: transform 3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    background: rgba(0,0,0,0.4);
 }
 
 .pointer {
     position: absolute;
-    top: -10px;
+    top: -8px;
     left: 50%;
     transform: translateX(-50%);
     width: 0;
     height: 0;
-    border-left: 12px solid transparent;
-    border-right: 12px solid transparent;
-    border-bottom: 18px solid #00aaff;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-bottom: 22px solid #00aaff;
     filter: drop-shadow(0 0 6px #00aaff);
     z-index: 10;
-}
-
-.wheel-labels-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 260px;
-    height: 260px;
-    pointer-events: none;
-}
-
-.wheel-label {
-    position: absolute;
-    width: 80px;
-    text-align: center;
-    font-size: 11px;
-    color: #00aaff;
-    text-shadow: 0 0 6px #00aaff;
-    transform-origin: 130px 130px;
 }
 
 /* EQUALIZER */
