@@ -7,8 +7,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const wheelCanvas = document.getElementById("wheelCanvas");
     const ctx = wheelCanvas.getContext("2d");
+
     const spinSound = document.getElementById("spinSound");
     const dingSound = document.getElementById("dingSound");
+
+    const liveTitle = document.getElementById("liveTitle");
+    const infoPanel = document.getElementById("infoPanel");
+    const wheelWrapper = document.getElementById("wheelWrapper");
 
     /* LOAD SAVED ITEMS + HISTORY */
     const savedItems = localStorage.getItem("music_items");
@@ -44,12 +49,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
-    /* SPIN BUTTON – RAFFLE WHEEL STYLE */
+    /* SPIN BUTTON – LIVE UPDATING RAFFLE WHEEL */
     document.getElementById("startBtn").onclick = () => {
         if (items.length === 0) return alert("No items loaded");
         if (spinning) return;
 
         spinning = true;
+        infoPanel.classList.add("hidden");
+        wheelWrapper.classList.remove("shift-left");
 
         const removeAfter = document.getElementById("removeAfter").checked;
         const count = items.length;
@@ -58,14 +65,11 @@ document.addEventListener("DOMContentLoaded", () => {
         // choose target index
         const targetIndex = Math.floor(Math.random() * count);
 
-        // pointer at -90deg (top). slice i center at -90 + i*sliceAngleDeg
-        // we want center of target slice at pointer after rotation R:
-        // (-90 + targetIndex*sliceAngleDeg) + R ≡ -90  => R ≡ -targetIndex*sliceAngleDeg
-        const spins = 5;
+        const spins = 6;
         const finalRotation = 360 * spins - targetIndex * sliceAngleDeg;
 
-        const speedFactor = document.getElementById("speedSlider").value; // 1–5
-        const duration = 4000 - (speedFactor - 1) * 500; // ms
+        const speedFactor = document.getElementById("speedSlider").value;
+        const duration = 4500 - (speedFactor - 1) * 500;
 
         // equalizer on
         document.getElementById("equalizer").style.display = "flex";
@@ -75,18 +79,37 @@ document.addEventListener("DOMContentLoaded", () => {
         spinSound.loop = true;
         spinSound.play();
 
+        // animate wheel
         wheelCanvas.style.transition = `transform ${duration}ms cubic-bezier(0.25, 0.8, 0.25, 1)`;
         wheelCanvas.style.transform = `rotate(${finalRotation}deg)`;
 
+        // LIVE UPDATE LOOP
+        const startTime = performance.now();
+        function updateLiveTitle(now) {
+            const elapsed = now - startTime;
+            if (elapsed >= duration) return;
+
+            const progress = elapsed / duration;
+            const angle = currentRotation + (finalRotation - currentRotation) * progress;
+
+            const normalized = ((angle % 360) + 360) % 360;
+            const index = Math.floor((normalized + sliceAngleDeg / 2) / sliceAngleDeg) % count;
+
+            liveTitle.textContent = items[index].Title;
+
+            requestAnimationFrame(updateLiveTitle);
+        }
+        requestAnimationFrame(updateLiveTitle);
+
+        // FINALIZE AFTER SPIN
         setTimeout(() => {
-            // stop spin sound
             spinSound.pause();
             spinSound.currentTime = 0;
 
             document.getElementById("equalizer").style.display = "none";
 
             const finalItem = items[targetIndex];
-            updateDisplay(finalItem, true);
+            liveTitle.textContent = finalItem.Title;
 
             dingSound.currentTime = 0;
             dingSound.play();
@@ -97,21 +120,35 @@ document.addEventListener("DOMContentLoaded", () => {
             saveHistory();
             renderHistory();
 
+            // show info panel
+            document.getElementById("currentTitle").textContent = finalItem.Title;
+            document.getElementById("description").textContent = finalItem.Description || "";
+
+            const img = document.getElementById("albumArt");
+            if (finalItem.ImageURL && finalItem.ImageURL.startsWith("http")) {
+                img.src = finalItem.ImageURL;
+                img.style.display = "block";
+            } else {
+                img.style.display = "none";
+            }
+
+            infoPanel.classList.remove("hidden");
+            wheelWrapper.classList.add("shift-left");
+
             if (removeAfter) {
                 items.splice(targetIndex, 1);
                 saveItems();
                 drawWheel();
             }
 
-            // normalize rotation so it doesn't grow forever
             currentRotation = finalRotation % 360;
             wheelCanvas.style.transition = "none";
             wheelCanvas.style.transform = `rotate(${currentRotation}deg)`;
 
-            // allow next spin after a tiny delay
             setTimeout(() => {
                 spinning = false;
             }, 100);
+
         }, duration);
     };
 
@@ -121,31 +158,21 @@ document.addEventListener("DOMContentLoaded", () => {
         const h = wheelCanvas.height;
         const cx = w / 2;
         const cy = h / 2;
-        const radius = Math.min(cx, cy) - 10;
+        const radius = Math.min(cx, cy) - 20;
 
         ctx.clearRect(0, 0, w, h);
 
-        if (items.length === 0) {
-            // draw placeholder circle
-            ctx.beginPath();
-            ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-            ctx.fillStyle = "rgba(0,0,0,0.4)";
-            ctx.fill();
-            ctx.strokeStyle = "rgba(255,255,255,0.2)";
-            ctx.lineWidth = 4;
-            ctx.stroke();
-            return;
-        }
+        if (items.length === 0) return;
 
         const count = items.length;
         const sliceAngle = (2 * Math.PI) / count;
         const colors = ["#00aaff", "#0044ff", "#00ddff", "#0088ff"];
 
         for (let i = 0; i < count; i++) {
-            const startAngle = -Math.PI / 2 + i * sliceAngle;
-            const endAngle = startAngle + sliceAngle;
+            const centerAngle = -Math.PI / 2 + i * sliceAngle;
+            const startAngle = centerAngle - sliceAngle / 2;
+            const endAngle = centerAngle + sliceAngle / 2;
 
-            // slice
             ctx.beginPath();
             ctx.moveTo(cx, cy);
             ctx.arc(cx, cy, radius, startAngle, endAngle);
@@ -153,44 +180,25 @@ document.addEventListener("DOMContentLoaded", () => {
             ctx.fillStyle = colors[i % colors.length];
             ctx.fill();
 
-            // slice border
             ctx.strokeStyle = "rgba(0,0,0,0.6)";
             ctx.lineWidth = 2;
             ctx.stroke();
 
-            // text
-            const midAngle = startAngle + sliceAngle / 2;
             ctx.save();
             ctx.translate(cx, cy);
-            ctx.rotate(midAngle);
+            ctx.rotate(centerAngle);
             ctx.textAlign = "right";
             ctx.fillStyle = "#000";
-            ctx.font = "14px Poppins";
-            const text = items[i].Title || "";
-            ctx.fillText(text, radius - 10, 5);
+            ctx.font = "16px Poppins";
+            ctx.fillText(items[i].Title, radius - 30, 6);
             ctx.restore();
         }
 
-        // outer glow ring
         ctx.beginPath();
         ctx.arc(cx, cy, radius, 0, Math.PI * 2);
         ctx.strokeStyle = "rgba(0,170,255,0.8)";
         ctx.lineWidth = 4;
         ctx.stroke();
-    }
-
-    /* UPDATE DISPLAY */
-    function updateDisplay(item, final) {
-        document.getElementById("currentTitle").textContent = item.Title || "";
-        document.getElementById("description").textContent = final ? (item.Description || "") : "";
-
-        const img = document.getElementById("albumArt");
-        if (item.ImageURL && item.ImageURL.startsWith("http")) {
-            img.src = item.ImageURL;
-            img.style.display = "block";
-        } else {
-            img.style.display = "none";
-        }
     }
 
     /* HISTORY PANEL */
@@ -202,7 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const div = document.createElement("div");
             div.className = "history-item";
             div.innerHTML = `
-                <strong>${item.Title || ""}</strong><br>
+                <strong>${item.Title}</strong><br>
                 ${item.Description || ""}<br>
                 ${item.ImageURL ? `<img src="${item.ImageURL}" width="100">` : ""}
             `;
@@ -250,15 +258,4 @@ document.addEventListener("DOMContentLoaded", () => {
                 p.x += p.dx;
                 p.y += p.dy;
                 p.alpha -= 0.02;
-                ctxP.fillStyle = `rgba(0,170,255,${p.alpha})`;
-                ctxP.beginPath();
-                ctxP.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctxP.fill();
-            });
-            if (particles.some(p => p.alpha > 0)) requestAnimationFrame(animate);
-        }
-
-        animate();
-    }
-
-});
+                ctxP.fillStyle = `rgba(0,170,255,${p
