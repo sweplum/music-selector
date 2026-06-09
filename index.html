@@ -39,9 +39,12 @@
         <!-- MAIN DISPLAY -->
         <section class="display glass">
 
-            <div class="wheel-container">
+            <!-- LIVE UPDATING TITLE ABOVE WHEEL -->
+            <h2 id="liveTitle" class="live-title">Ready</h2>
+
+            <div id="wheelWrapper" class="wheel-wrapper">
                 <div class="pointer"></div>
-                <canvas id="wheelCanvas" width="400" height="400"></canvas>
+                <canvas id="wheelCanvas" width="420" height="420"></canvas>
             </div>
 
             <div class="equalizer" id="equalizer">
@@ -52,11 +55,14 @@
                 <div class="bar"></div>
             </div>
 
-            <h2 id="currentTitle" class="title-display">Browse a CSV to begin</h2>
+        </section>
+
+        <!-- RIGHT INFO PANEL -->
+        <aside id="infoPanel" class="info-panel glass hidden">
+            <h2 id="currentTitle" class="title-display"></h2>
             <img id="albumArt" class="album-art" style="display:none;">
             <p id="description" class="description"></p>
-
-        </section>
+        </aside>
 
         <!-- HISTORY PANEL -->
         <aside class="history glass">
