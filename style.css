@@ -158,7 +158,7 @@ body {
     font-size: 16px;
 }
 
-/* WHEEL */
+/* WHEEL + POINTER */
 .wheel-container {
     position: relative;
     width: 260px;
@@ -166,33 +166,34 @@ body {
     margin-bottom: 20px;
 }
 
-.wheel-labels-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 260px;
-    height: 260px;
-    pointer-events: none;
-    animation: spin 1s linear infinite;
-    transform-origin: 130px 130px;
-}
-
 .spinner-wheel {
     width: 260px;
     height: 260px;
-    border: 6px solid rgba(255,255,255,0.1);
-    border-top: 6px solid #00aaff;
     border-radius: 50%;
-    animation: spin 1s linear infinite;
-    display: none;
+    border: 6px solid rgba(255,255,255,0.15);
+    position: relative;
+    margin: 0 auto;
+    overflow: visible;
+    transform: rotate(0deg);
+    transition: transform 3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    background: rgba(0,0,0,0.4);
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+.pointer {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-bottom: 18px solid #00aaff;
+    filter: drop-shadow(0 0 6px #00aaff);
+    z-index: 10;
 }
 
-#wheelLabels {
+.wheel-labels-container {
     position: absolute;
     top: 0;
     left: 0;
@@ -203,10 +204,12 @@ body {
 
 .wheel-label {
     position: absolute;
-    transform-origin: 130px 130px;
+    width: 80px;
+    text-align: center;
+    font-size: 11px;
     color: #00aaff;
-    font-size: 12px;
     text-shadow: 0 0 6px #00aaff;
+    transform-origin: 130px 130px;
 }
 
 /* EQUALIZER */
