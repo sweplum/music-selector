@@ -12,7 +12,7 @@
 <div class="app-container">
 
     <header class="header">
-        <h1>🎵 Music Selector🎵</h1>
+        <h1>🎵 Music Selector</h1>
     </header>
 
     <div class="main-layout">
@@ -27,7 +27,7 @@
             </label>
 
             <label class="control-label">Spin Speed</label>
-            <input type="range" id="speedSlider" min="20" max="300" value="100">
+            <input type="range" id="speedSlider" min="1" max="5" value="3">
 
             <label class="checkbox">
                 <input type="checkbox" id="removeAfter"> Remove after selection
@@ -40,8 +40,10 @@
         <section class="display glass">
 
             <div class="wheel-container">
-                <div class="spinner-wheel" id="spinnerWheel"></div>
-                <div id="wheelLabels" class="wheel-labels-container"></div>
+                <div class="pointer"></div>
+                <div class="spinner-wheel" id="spinnerWheel">
+                    <div id="wheelLabels" class="wheel-labels-container"></div>
+                </div>
             </div>
 
             <div class="equalizer" id="equalizer">
@@ -52,7 +54,7 @@
                 <div class="bar"></div>
             </div>
 
-            <h2 id="currentTitle" class="title-display">Upload a CSV to begin</h2>
+            <h2 id="currentTitle" class="title-display">Browse a CSV to begin</h2>
             <img id="albumArt" class="album-art" style="display:none;">
             <p id="description" class="description"></p>
 
@@ -69,6 +71,7 @@
 
 </div>
 
+<audio id="spinSound" src="spin.wav"></audio>
 <audio id="dingSound" src="ding.wav"></audio>
 
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
